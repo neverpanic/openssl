@@ -73,6 +73,9 @@ typedef struct {
      * by their Final function.
      */
     unsigned int flag_allow_md : 1;
+    /* Flag indicating that this context is used in a combined digest/sign or
+     * digest/verify operation. */
+    unsigned int flag_is_digest_sigver : 1;
 
     /* The Algorithm Identifier of the combined signature algorithm */
     unsigned char aid_buf[OSSL_MAX_ALGORITHM_ID_SIZE];
@@ -133,6 +136,26 @@ static int ecdsa_signverify_init(void *vctx, void *ec,
     if (!ossl_prov_is_running()
             || ctx == NULL)
         return 0;
+
+#ifdef FIPS_MODULE
+    {
+        const OSSL_PARAM *katparam = OSSL_PARAM_locate_const(params, OSSL_SIGNATURE_PARAM_KAT);
+        if (katparam != NULL) {
+            int kattests = 0;
+            if (OSSL_PARAM_get_int(katparam, &kattests) && kattests) {
+                ctx->flag_is_digest_sigver = 1;
+            }
+        }
+    }
+
+    if (!ctx->flag_is_digest_sigver) {
+        ERR_raise_data(ERR_LIB_PROV, PROV_R_NOT_SUPPORTED,
+            "ECDSA signatures are not supported using the "
+            "EVP_PKEY_sign/EVP_PKEY_verify API in FIPS mode, use "
+            "EVP_DigestSign and EVP_DigestVerify.");
+        return 0;
+    }
+#endif
 
     if (ec == NULL && ctx->ec == NULL) {
         ERR_raise(ERR_LIB_PROV, PROV_R_NO_KEY_SET);
@@ -286,6 +309,11 @@ static int ecdsa_digest_signverify_init(void *vctx, const char *mdname,
 
     if (!ossl_prov_is_running())
         return 0;
+
+    if (ctx == NULL)
+        return 0;
+
+    ctx->flag_is_digest_sigver = 1;
 
     if (!ecdsa_signverify_init(vctx, ec, params, operation)
         || !ecdsa_setup_md(ctx, mdname, NULL))

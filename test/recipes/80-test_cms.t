@@ -72,7 +72,7 @@ my @smime_pkcs7_tests = (
     [ "signed content DER format, RSA key",
       [ "{cmd1}", @prov, "-sign", "-in", $smcont, "-outform", "DER", "-nodetach",
         "-certfile", $smroot, "-signer", $smrsa1, "-out", "{output}.cms" ],
-      [ "{cmd2}",  @prov, "-verify", "-in", "{output}.cms", "-inform", "DER",
+      [ "{cmd2}",  @defaultprov, "-verify", "-in", "{output}.cms", "-inform", "DER",
         "-CAfile", $smroot, "-out", "{output}.txt" ],
       \&final_compare
     ],
@@ -80,7 +80,7 @@ my @smime_pkcs7_tests = (
     [ "signed detached content DER format, RSA key",
       [ "{cmd1}", @prov, "-sign", "-in", $smcont, "-outform", "DER",
         "-signer", $smrsa1, "-out", "{output}.cms" ],
-      [ "{cmd2}", @prov, "-verify", "-in", "{output}.cms", "-inform", "DER",
+      [ "{cmd2}", @defaultprov, "-verify", "-in", "{output}.cms", "-inform", "DER",
         "-CAfile", $smroot, "-out", "{output}.txt",
         "-content", $smcont ],
       \&final_compare
@@ -90,7 +90,7 @@ my @smime_pkcs7_tests = (
       [ "{cmd1}", @prov, "-sign", "-in", $smcont, "-outform", "DER", "-nodetach",
         "-stream",
         "-signer", $smrsa1, "-out", "{output}.cms" ],
-      [ "{cmd2}", @prov, "-verify", "-in", "{output}.cms", "-inform", "DER",
+      [ "{cmd2}", @defaultprov, "-verify", "-in", "{output}.cms", "-inform", "DER",
         "-CAfile", $smroot, "-out", "{output}.txt" ],
       \&final_compare
     ],
@@ -117,7 +117,7 @@ my @smime_pkcs7_tests = (
         "-signer", catfile($smdir, "smdsa1.pem"), "-out", "{output}.cms" ],
       [ "{cmd1}", @prov, "-resign", "-in", "{output}.cms", "-inform", "DER", "-outform", "DER",
         "-signer", $smrsa1, "-out", "{output}2.cms" ],
-      [ "{cmd2}", @prov, "-verify", "-in", "{output}2.cms", "-inform", "DER",
+      [ "{cmd2}", @defaultprov, "-verify", "-in", "{output}2.cms", "-inform", "DER",
         "-CAfile", $smroot, "-out", "{output}.txt",
         "-content", $smcont ],
       \&final_compare
@@ -140,20 +140,20 @@ my @smime_pkcs7_tests = (
         "-signer", catfile($smdir, "smdsa1.pem"),
         "-signer", catfile($smdir, "smdsa2.pem"),
         "-out", "{output}.cms" ],
-      [ "{cmd2}", @prov, "-verify", "-in", "{output}.cms", "-inform", "DER",
+      [ "{cmd2}", @defaultprov, "-verify", "-in", "{output}.cms", "-inform", "DER",
         "-CAfile", $smroot, "-out", "{output}.txt" ],
       \&final_compare
     ],
 
     [ "signed content test streaming BER format, 2 DSA and 2 RSA keys, no attributes",
-      [ "{cmd1}", @prov, "-sign", "-in", $smcont, "-outform", "DER",
+      [ "{cmd1}", @defaultprov, "-sign", "-in", $smcont, "-outform", "DER",
         "-noattr", "-nodetach", "-stream",
         "-signer", $smrsa1,
         "-signer", catfile($smdir, "smrsa2.pem"),
         "-signer", catfile($smdir, "smdsa1.pem"),
         "-signer", catfile($smdir, "smdsa2.pem"),
         "-out", "{output}.cms" ],
-      [ "{cmd2}", @prov, "-verify", "-in", "{output}.cms", "-inform", "DER",
+      [ "{cmd2}", @defaultprov, "-verify", "-in", "{output}.cms", "-inform", "DER",
         "-CAfile", $smroot, "-out", "{output}.txt" ],
       \&final_compare
     ],
@@ -182,7 +182,7 @@ my @smime_pkcs7_tests = (
         "-signer", catfile($smdir, "smdsa1.pem"),
         "-signer", catfile($smdir, "smdsa2.pem"),
         "-stream", "-out", "{output}.cms" ],
-      [ "{cmd2}", @prov, "-verify", "-in", "{output}.cms",
+      [ "{cmd2}", @defaultprov, "-verify", "-in", "{output}.cms",
         "-CAfile", $smroot, "-out", "{output}.txt" ],
       \&final_compare
     ],
@@ -194,7 +194,7 @@ my @smime_pkcs7_tests = (
         "-signer", catfile($smdir, "smdsa1.pem"),
         "-signer", catfile($smdir, "smdsa2.pem"),
         "-stream", "-out", "{output}.cms" ],
-      [ "{cmd2}", @prov, "-verify", "-in", "{output}.cms",
+      [ "{cmd2}", @defaultprov, "-verify", "-in", "{output}.cms",
         "-CAfile", $smroot, "-out", "{output}.txt" ],
       \&final_compare
     ],
@@ -504,11 +504,11 @@ my @smime_cms_param_tests = (
     ],
 
     [ "signed content test streaming PEM format, RSA keys, PSS signature, no attributes",
-      [ "{cmd1}", @prov, "-sign", "-in", $smcont, "-outform", "PEM", "-nodetach",
+      [ "{cmd1}", @defaultprov, "-sign", "-in", $smcont, "-outform", "PEM", "-nodetach",
         "-noattr", "-signer", $smrsa1,
         "-keyopt", "rsa_padding_mode:pss",
         "-out", "{output}.cms" ],
-      [ "{cmd2}", @prov, "-verify", "-in", "{output}.cms", "-inform", "PEM",
+      [ "{cmd2}", @defaultprov, "-verify", "-in", "{output}.cms", "-inform", "PEM",
         "-CAfile", $smroot, "-out", "{output}.txt" ],
       \&final_compare
     ],

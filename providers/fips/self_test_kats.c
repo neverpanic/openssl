@@ -479,24 +479,23 @@ static int self_test_sign(const ST_KAT_SIGN *t,
         || EVP_PKEY_fromdata(kctx, &pkey, EVP_PKEY_KEYPAIR, params) <= 0)
         goto err;
 
-    /* Create a EVP_PKEY_CTX to use for the signing operation */
-    sctx = EVP_PKEY_CTX_new_from_pkey(libctx, pkey, NULL);
-    if (sctx == NULL
-        || EVP_PKEY_sign_init(sctx) <= 0)
-        goto err;
-
-    /* set signature parameters */
+    /* prepare signature parameters */
     if (!OSSL_PARAM_BLD_push_utf8_string(bld, OSSL_SIGNATURE_PARAM_DIGEST,
                                          t->mdalgorithm,
                                          strlen(t->mdalgorithm) + 1))
         goto err;
+    if (!OSSL_PARAM_BLD_push_int(bld, OSSL_SIGNATURE_PARAM_KAT, 1))
+        goto err;
     params_sig = OSSL_PARAM_BLD_to_param(bld);
-    if (EVP_PKEY_CTX_set_params(sctx, params_sig) <= 0)
+
+    /* Create a EVP_PKEY_CTX to use for the signing operation */
+    sctx = EVP_PKEY_CTX_new_from_pkey(libctx, pkey, NULL);
+    if (sctx == NULL
+        || EVP_PKEY_sign_init_ex(sctx, params_sig) <= 0)
         goto err;
 
     if (EVP_PKEY_sign(sctx, sig, &siglen, dgst, sizeof(dgst)) <= 0
-        || EVP_PKEY_verify_init(sctx) <= 0
-        || EVP_PKEY_CTX_set_params(sctx, params_sig) <= 0)
+        || EVP_PKEY_verify_init_ex(sctx, params_sig) <= 0)
         goto err;
 
     /*

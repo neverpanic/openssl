@@ -41,6 +41,11 @@ normally used to sign digests. For signing arbitrary messages, see the
 L<EVP_DigestSignInit(3)> and
 L<EVP_SignInit(3)> signing interfaces instead.
 
+B<WARNING>: Because FIPS 140-3 requires that a signed digest is computed in the
+same module as the signature, this API is disabled on CentOS 9 Stream and Red
+Hat Enterprise Linux in FIPS mode.  Use L<EVP_DigestSignInit(3)> and
+L<EVP_SignInit(3)> instead.
+
 After the call to EVP_PKEY_sign_init() algorithm specific control
 operations can be performed to set any appropriate parameters for the
 operation (see L<EVP_PKEY_CTX_ctrl(3)>).

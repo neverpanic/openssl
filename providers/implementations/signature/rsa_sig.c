@@ -88,6 +88,9 @@ typedef struct {
      */
     unsigned int flag_allow_md : 1;
     unsigned int mgf1_md_set : 1;
+    /* Flag indicating that this context is used in a combined digest/sign or
+     * digest/verify operation. */
+    unsigned int flag_is_digest_sigver : 1;
 
     /* main digest */
     EVP_MD *md;
@@ -393,6 +396,26 @@ static int rsa_signverify_init(void *vprsactx, void *vrsa,
 
     if (!ossl_prov_is_running() || prsactx == NULL)
         return 0;
+
+#ifdef FIPS_MODULE
+    {
+        const OSSL_PARAM *katparam = OSSL_PARAM_locate_const(params, OSSL_SIGNATURE_PARAM_KAT);
+        if (katparam != NULL) {
+            int kattests = 0;
+            if (OSSL_PARAM_get_int(katparam, &kattests) && kattests) {
+                prsactx->flag_is_digest_sigver = 1;
+            }
+        }
+    }
+
+    if (!prsactx->flag_is_digest_sigver) {
+        ERR_raise_data(ERR_LIB_PROV, PROV_R_NOT_SUPPORTED,
+            "RSA signatures are not supported using the "
+            "EVP_PKEY_sign/EVP_PKEY_verify API in FIPS mode, use "
+            "EVP_DigestSign and EVP_DigestVerify.");
+        return 0;
+    }
+#endif
 
     if (vrsa == NULL && prsactx->rsa == NULL) {
         ERR_raise(ERR_LIB_PROV, PROV_R_NO_KEY_SET);
@@ -850,6 +873,11 @@ static int rsa_digest_signverify_init(void *vprsactx, const char *mdname,
 
     if (!ossl_prov_is_running())
         return 0;
+
+    if (prsactx == NULL)
+        return 0;
+
+    prsactx->flag_is_digest_sigver = 1;
 
     if (!rsa_signverify_init(vprsactx, vrsa, params, operation))
         return 0;
