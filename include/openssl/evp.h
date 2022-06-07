@@ -731,6 +731,8 @@ __owur EVP_MD *EVP_MD_fetch(OSSL_LIB_CTX *ctx, const char *algorithm,
 int EVP_MD_up_ref(EVP_MD *md);
 void EVP_MD_free(EVP_MD *md);
 
+int EVP_MD_fips_indicator(EVP_MD *md, int function_id);
+
 int EVP_read_pw_string(char *buf, int length, const char *prompt, int verify);
 int EVP_read_pw_string_min(char *buf, int minlen, int maxlen,
                            const char *prompt, int verify);

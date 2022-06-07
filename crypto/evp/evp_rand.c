@@ -112,9 +112,11 @@ static void evp_rand_unlock(EVP_RAND_CTX *rand)
         rand->meth->unlock(rand->algctx);
 }
 
-static void *evp_rand_from_algorithm(int name_id,
-                                     const OSSL_ALGORITHM *algodef,
-                                     OSSL_PROVIDER *prov)
+static void *evp_rand_from_algorithm(
+        int name_id,
+        const OSSL_ALGORITHM *algodef,
+        const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
+        OSSL_PROVIDER *prov)
 {
     const OSSL_DISPATCH *fns = algodef->implementation;
     EVP_RAND *rand = NULL;

@@ -40,9 +40,11 @@ static EVP_KEYEXCH *evp_keyexch_new(OSSL_PROVIDER *prov)
     return exchange;
 }
 
-static void *evp_keyexch_from_algorithm(int name_id,
-                                        const OSSL_ALGORITHM *algodef,
-                                        OSSL_PROVIDER *prov)
+static void *evp_keyexch_from_algorithm(
+        int name_id,
+        const OSSL_ALGORITHM *algodef,
+        const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
+        OSSL_PROVIDER *prov)
 {
     const OSSL_DISPATCH *fns = algodef->implementation;
     EVP_KEYEXCH *exchange = NULL;

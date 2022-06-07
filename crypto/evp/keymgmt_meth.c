@@ -33,9 +33,11 @@ static void *keymgmt_new(void)
     return keymgmt;
 }
 
-static void *keymgmt_from_algorithm(int name_id,
-                                    const OSSL_ALGORITHM *algodef,
-                                    OSSL_PROVIDER *prov)
+static void *keymgmt_from_algorithm(
+        int name_id,
+        const OSSL_ALGORITHM *algodef,
+        const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
+        OSSL_PROVIDER *prov)
 {
     const OSSL_DISPATCH *fns = algodef->implementation;
     EVP_KEYMGMT *keymgmt = NULL;

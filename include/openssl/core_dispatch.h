@@ -249,6 +249,11 @@ OSSL_CORE_MAKE_FUNC(int, provider_get_capabilities, (void *provctx,
 # define OSSL_FUNC_PROVIDER_SELF_TEST          1031
 OSSL_CORE_MAKE_FUNC(int, provider_self_test, (void *provctx))
 
+# define OSSL_FUNC_PROVIDER_RH_QUERY_FIPSINDICATOR 1535
+OSSL_CORE_MAKE_FUNC(const OSSL_RH_FIPSINDICATOR_ALGORITHM *,
+                    provider_query_fipsindicator, (void *provctx,
+                        int operation_id))
+
 /* Operations */
 
 # define OSSL_OP_DIGEST                              1

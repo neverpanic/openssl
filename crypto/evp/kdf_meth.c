@@ -56,9 +56,11 @@ static void *evp_kdf_new(void)
     return kdf;
 }
 
-static void *evp_kdf_from_algorithm(int name_id,
-                                    const OSSL_ALGORITHM *algodef,
-                                    OSSL_PROVIDER *prov)
+static void *evp_kdf_from_algorithm(
+        int name_id,
+        const OSSL_ALGORITHM *algodef,
+        const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
+        OSSL_PROVIDER *prov)
 {
     const OSSL_DISPATCH *fns = algodef->implementation;
     EVP_KDF *kdf = NULL;

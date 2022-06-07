@@ -76,12 +76,13 @@ static int ossl_method_construct_postcondition(OSSL_PROVIDER *provider,
 
 static void ossl_method_construct_this(OSSL_PROVIDER *provider,
                                        const OSSL_ALGORITHM *algo,
+                                       const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
                                        int no_store, void *cbdata)
 {
     struct construct_data_st *data = cbdata;
     void *method = NULL;
 
-    if ((method = data->mcm->construct(algo, provider, data->mcm_data))
+    if ((method = data->mcm->construct(algo, fipsindicator, provider, data->mcm_data))
         == NULL)
         return;
 

@@ -18,8 +18,8 @@ struct algorithm_data_st {
     int operation_id;            /* May be zero for finding them all */
     int (*pre)(OSSL_PROVIDER *, int operation_id, int no_store, void *data,
                int *result);
-    void (*fn)(OSSL_PROVIDER *, const OSSL_ALGORITHM *, int no_store,
-               void *data);
+    void (*fn)(OSSL_PROVIDER *, const OSSL_ALGORITHM *, const OSSL_RH_FIPSINDICATOR_ALGORITHM *,
+               int no_store, void *data);
     int (*post)(OSSL_PROVIDER *, int operation_id, int no_store, void *data,
                 int *result);
     void *data;
@@ -38,6 +38,7 @@ struct algorithm_data_st {
  * 1 if successful so far, and adding should continue
  */
 static int algorithm_do_map(OSSL_PROVIDER *provider, const OSSL_ALGORITHM *map,
+                            const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator_map,
                             int cur_operation, int no_store, void *cbdata)
 {
     struct algorithm_data_st *data = cbdata;
@@ -63,9 +64,25 @@ static int algorithm_do_map(OSSL_PROVIDER *provider, const OSSL_ALGORITHM *map,
 
     if (map != NULL) {
         const OSSL_ALGORITHM *thismap;
+        const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator = NULL;
 
-        for (thismap = map; thismap->algorithm_names != NULL; thismap++)
-            data->fn(provider, thismap, no_store, data->data);
+        for (thismap = map; thismap->algorithm_names != NULL; thismap++) {
+            if (fipsindicator_map != NULL) {
+                const OSSL_RH_FIPSINDICATOR_ALGORITHM *thisfipsindicator;
+                for (thisfipsindicator = fipsindicator_map;
+                        thisfipsindicator->algorithm_names != NULL;
+                        ++thisfipsindicator) {
+                    if (strcmp(thismap->algorithm_names,
+                                thisfipsindicator->algorithm_names) == 0 &&
+                            strcmp(thismap->property_definition,
+                                thisfipsindicator->property_definition) == 0) {
+                        fipsindicator = thisfipsindicator;
+                        break;
+                    }
+                }
+            }
+            data->fn(provider, thismap, fipsindicator, no_store, data->data);
+        }
     }
 
     /* Do we fulfill post-conditions? */
@@ -103,11 +120,15 @@ static int algorithm_do_this(OSSL_PROVIDER *provider, void *cbdata)
          cur_operation++) {
         int no_store = 0;        /* Assume caching is ok */
         const OSSL_ALGORITHM *map = NULL;
+        const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator_map = NULL;
         int ret;
 
         map = ossl_provider_query_operation(provider, cur_operation,
                                             &no_store);
-        ret = algorithm_do_map(provider, map, cur_operation, no_store, data);
+        fipsindicator_map = ossl_provider_query_fipsindicator(
+                provider, cur_operation);
+        ret = algorithm_do_map(provider, map, fipsindicator_map, cur_operation,
+                               no_store, data);
         ossl_provider_unquery_operation(provider, cur_operation, map);
 
         if (ret < 0)
@@ -128,6 +149,7 @@ void ossl_algorithm_do_all(OSSL_LIB_CTX *libctx, int operation_id,
                                       int no_store, void *data, int *result),
                            void (*fn)(OSSL_PROVIDER *provider,
                                       const OSSL_ALGORITHM *algo,
+                                      const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
                                       int no_store, void *data),
                            int (*post)(OSSL_PROVIDER *, int operation_id,
                                        int no_store, void *data, int *result),

@@ -237,8 +237,10 @@ static void *loader_from_algorithm(int scheme_id, const OSSL_ALGORITHM *algodef,
  * This function is responsible to getting an identity number for them,
  * then call loader_from_algorithm() with that identity number.
  */
-static void *construct_loader(const OSSL_ALGORITHM *algodef,
-                              OSSL_PROVIDER *prov, void *data)
+static void *construct_loader(
+        const OSSL_ALGORITHM *algodef,
+        const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
+        OSSL_PROVIDER *prov, void *data)
 {
     /*
      * This function is only called if get_loader_from_store() returned

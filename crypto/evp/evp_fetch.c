@@ -53,8 +53,10 @@ struct evp_method_data_st {
 
     unsigned int flag_construct_error_occurred : 1;
 
-    void *(*method_from_algorithm)(int name_id, const OSSL_ALGORITHM *,
-                                   OSSL_PROVIDER *);
+    void *(*method_from_algorithm)(
+            int name_id, const OSSL_ALGORITHM *,
+            const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
+            OSSL_PROVIDER *);
     int (*refcnt_up_method)(void *method);
     void (*destruct_method)(void *method);
 };
@@ -195,6 +197,7 @@ static int put_evp_method_in_store(void *store, void *method,
  * This function is responsible to getting an identity number for it.
  */
 static void *construct_evp_method(const OSSL_ALGORITHM *algodef,
+                                  const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
                                   OSSL_PROVIDER *prov, void *data)
 {
     /*
@@ -214,7 +217,7 @@ static void *construct_evp_method(const OSSL_ALGORITHM *algodef,
     if (name_id == 0)
         return NULL;
 
-    method = methdata->method_from_algorithm(name_id, algodef, prov);
+    method = methdata->method_from_algorithm(name_id, algodef, fipsindicator, prov);
 
     /*
      * Flag to indicate that there was actual construction errors.  This
@@ -239,9 +242,11 @@ inner_evp_generic_fetch(struct evp_method_data_st *methdata,
                         OSSL_PROVIDER *prov, int operation_id,
                         int name_id, const char *name,
                         const char *properties,
-                        void *(*new_method)(int name_id,
-                                            const OSSL_ALGORITHM *algodef,
-                                            OSSL_PROVIDER *prov),
+                        void *(*new_method)(
+                            int name_id,
+                            const OSSL_ALGORITHM *algodef,
+                            const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
+                            OSSL_PROVIDER *prov),
                         int (*up_ref_method)(void *),
                         void (*free_method)(void *))
 {
@@ -358,9 +363,11 @@ inner_evp_generic_fetch(struct evp_method_data_st *methdata,
 
 void *evp_generic_fetch(OSSL_LIB_CTX *libctx, int operation_id,
                         const char *name, const char *properties,
-                        void *(*new_method)(int name_id,
-                                            const OSSL_ALGORITHM *algodef,
-                                            OSSL_PROVIDER *prov),
+                        void *(*new_method)(
+                            int name_id,
+                            const OSSL_ALGORITHM *algodef,
+                            const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
+                            OSSL_PROVIDER *prov),
                         int (*up_ref_method)(void *),
                         void (*free_method)(void *))
 {
@@ -385,9 +392,11 @@ void *evp_generic_fetch(OSSL_LIB_CTX *libctx, int operation_id,
  */
 void *evp_generic_fetch_by_number(OSSL_LIB_CTX *libctx, int operation_id,
                                   int name_id, const char *properties,
-                                  void *(*new_method)(int name_id,
-                                                      const OSSL_ALGORITHM *algodef,
-                                                      OSSL_PROVIDER *prov),
+                                  void *(*new_method)(
+                                      int name_id,
+                                      const OSSL_ALGORITHM *algodef,
+                                      const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
+                                      OSSL_PROVIDER *prov),
                                   int (*up_ref_method)(void *),
                                   void (*free_method)(void *))
 {
@@ -411,9 +420,11 @@ void *evp_generic_fetch_by_number(OSSL_LIB_CTX *libctx, int operation_id,
  */
 void *evp_generic_fetch_from_prov(OSSL_PROVIDER *prov, int operation_id,
                                   const char *name, const char *properties,
-                                  void *(*new_method)(int name_id,
-                                                      const OSSL_ALGORITHM *algodef,
-                                                      OSSL_PROVIDER *prov),
+                                  void *(*new_method)(
+                                      int name_id,
+                                      const OSSL_ALGORITHM *algodef,
+                                      const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
+                                      OSSL_PROVIDER *prov),
                                   int (*up_ref_method)(void *),
                                   void (*free_method)(void *))
 {
@@ -616,9 +627,11 @@ static void filter_on_operation_id(int id, void *method, void *arg)
 void evp_generic_do_all(OSSL_LIB_CTX *libctx, int operation_id,
                         void (*user_fn)(void *method, void *arg),
                         void *user_arg,
-                        void *(*new_method)(int name_id,
-                                            const OSSL_ALGORITHM *algodef,
-                                            OSSL_PROVIDER *prov),
+                        void *(*new_method)(
+                            int name_id,
+                            const OSSL_ALGORITHM *algodef,
+                            const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
+                            OSSL_PROVIDER *prov),
                         int (*up_ref_method)(void *),
                         void (*free_method)(void *))
 {

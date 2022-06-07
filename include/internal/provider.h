@@ -94,6 +94,8 @@ const OSSL_ALGORITHM *ossl_provider_query_operation(const OSSL_PROVIDER *prov,
 void ossl_provider_unquery_operation(const OSSL_PROVIDER *prov,
                                      int operation_id,
                                      const OSSL_ALGORITHM *algs);
+const OSSL_RH_FIPSINDICATOR_ALGORITHM *ossl_provider_query_fipsindicator(
+        const OSSL_PROVIDER *prov, int operation_id);
 
 /*
  * Cache of bits to see if we already added methods for an operation in

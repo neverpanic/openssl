@@ -196,6 +196,7 @@ static int put_decoder_in_store(void *store, void *method,
 
 /* Create and populate a decoder method */
 void *ossl_decoder_from_algorithm(int id, const OSSL_ALGORITHM *algodef,
+                                  const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
                                   OSSL_PROVIDER *prov)
 {
     OSSL_DECODER *decoder = NULL;
@@ -287,6 +288,7 @@ void *ossl_decoder_from_algorithm(int id, const OSSL_ALGORITHM *algodef,
  * then call ossl_decoder_from_algorithm() with that identity number.
  */
 static void *construct_decoder(const OSSL_ALGORITHM *algodef,
+                               const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
                                OSSL_PROVIDER *prov, void *data)
 {
     /*
@@ -303,7 +305,7 @@ static void *construct_decoder(const OSSL_ALGORITHM *algodef,
     void *method = NULL;
 
     if (id != 0)
-        method = ossl_decoder_from_algorithm(id, algodef, prov);
+        method = ossl_decoder_from_algorithm(id, algodef, fipsindicator, prov);
 
     /*
      * Flag to indicate that there was actual construction errors.  This

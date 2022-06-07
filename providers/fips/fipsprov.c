@@ -272,6 +272,38 @@ static const OSSL_ALGORITHM fips_digests[] = {
     { NULL, NULL, NULL }
 };
 
+static const OSSL_RH_FIPSINDICATOR_ALGORITHM redhat_indicator_fips_digests[] = {
+    /* Our primary name:NiST name[:our older names] */
+    { PROV_NAMES_SHA1, FIPS_DEFAULT_PROPERTIES, ossl_sha1_indicators },
+    { PROV_NAMES_SHA2_224, FIPS_DEFAULT_PROPERTIES, ossl_sha224_indicators },
+    { PROV_NAMES_SHA2_256, FIPS_DEFAULT_PROPERTIES, ossl_sha256_indicators },
+    { PROV_NAMES_SHA2_384, FIPS_DEFAULT_PROPERTIES, ossl_sha384_indicators },
+    { PROV_NAMES_SHA2_512, FIPS_DEFAULT_PROPERTIES, ossl_sha512_indicators },
+    { PROV_NAMES_SHA2_512_224, FIPS_DEFAULT_PROPERTIES,
+      ossl_sha512_224_indicators },
+    { PROV_NAMES_SHA2_512_256, FIPS_DEFAULT_PROPERTIES,
+      ossl_sha512_256_indicators },
+
+    /* We agree with NIST here, so one name only */
+    { PROV_NAMES_SHA3_224, FIPS_DEFAULT_PROPERTIES, ossl_sha3_224_indicators },
+    { PROV_NAMES_SHA3_256, FIPS_DEFAULT_PROPERTIES, ossl_sha3_256_indicators },
+    { PROV_NAMES_SHA3_384, FIPS_DEFAULT_PROPERTIES, ossl_sha3_384_indicators },
+    { PROV_NAMES_SHA3_512, FIPS_DEFAULT_PROPERTIES, ossl_sha3_512_indicators },
+
+    { PROV_NAMES_SHAKE_128, FIPS_DEFAULT_PROPERTIES, ossl_shake_128_indicators },
+    { PROV_NAMES_SHAKE_256, FIPS_DEFAULT_PROPERTIES, ossl_shake_256_indicators },
+
+    /*
+     * KECCAK-KMAC-128 and KECCAK-KMAC-256 as hashes are mostly useful for
+     * KMAC128 and KMAC256.
+     */
+    { PROV_NAMES_KECCAK_KMAC_128, FIPS_DEFAULT_PROPERTIES,
+      ossl_keccak_kmac_128_indicators },
+    { PROV_NAMES_KECCAK_KMAC_256, FIPS_DEFAULT_PROPERTIES,
+      ossl_keccak_kmac_256_indicators },
+    { NULL, NULL, NULL }
+};
+
 static const OSSL_ALGORITHM_CAPABLE fips_ciphers[] = {
     /* Our primary name[:ASN.1 OID name][:our older names] */
     ALG(PROV_NAMES_AES_256_ECB, ossl_aes256ecb_functions),
@@ -487,6 +519,37 @@ static const OSSL_ALGORITHM *fips_query(void *provctx, int operation_id,
     return NULL;
 }
 
+static const OSSL_RH_FIPSINDICATOR_ALGORITHM *query_fipsindicator(void *provctx, int operation_id) {
+    (void) provctx;
+
+    switch (operation_id) {
+    case OSSL_OP_DIGEST:
+        return redhat_indicator_fips_digests;
+    /*
+    case OSSL_OP_CIPHER:
+        return redhat_indicator_fips_ciphers;
+    case OSSL_OP_MAC:
+        return redhat_indicator_fips_macs;
+    case OSSL_OP_KDF:
+        return redhat_indicator_fips_kdfs;
+    case OSSL_OP_RAND:
+        return redhat_indicator_fips_rands;
+    case OSSL_OP_KEYMGMT:
+        return redhat_indicator_fips_keymgmt;
+    case OSSL_OP_KEYEXCH:
+        return redhat_indicator_fips_keyexch;
+    case OSSL_OP_SIGNATURE:
+        return redhat_indicator_fips_signature;
+    case OSSL_OP_ASYM_CIPHER:
+        return redhat_indicator_fips_asym_cipher;
+    case OSSL_OP_KEM:
+        return redhat_indicator_fips_asym_kem;
+    */
+    }
+    return NULL;
+}
+
+
 static void fips_teardown(void *provctx)
 {
     OSSL_LIB_CTX_free(PROV_LIBCTX_OF(provctx));
@@ -512,6 +575,7 @@ static const OSSL_DISPATCH fips_dispatch_table[] = {
     { OSSL_FUNC_PROVIDER_GET_CAPABILITIES,
       (void (*)(void))ossl_prov_get_capabilities },
     { OSSL_FUNC_PROVIDER_SELF_TEST, (void (*)(void))fips_self_test },
+    { OSSL_FUNC_PROVIDER_RH_QUERY_FIPSINDICATOR, (void (*)(void))query_fipsindicator },
     { 0, NULL }
 };
 

@@ -175,6 +175,7 @@ struct ossl_provider_st {
     OSSL_FUNC_provider_self_test_fn *self_test;
     OSSL_FUNC_provider_query_operation_fn *query_operation;
     OSSL_FUNC_provider_unquery_operation_fn *unquery_operation;
+    OSSL_FUNC_provider_query_fipsindicator_fn *query_fipsindicator;
 
     /*
      * Cache of bit to indicate of query_operation() has been called on
@@ -947,6 +948,10 @@ static int provider_init(OSSL_PROVIDER *prov)
             prov->unquery_operation =
                 OSSL_FUNC_provider_unquery_operation(provider_dispatch);
             break;
+        case OSSL_FUNC_PROVIDER_RH_QUERY_FIPSINDICATOR:
+            prov->query_fipsindicator =
+                OSSL_FUNC_provider_query_fipsindicator(provider_dispatch);
+            break;
 #ifndef OPENSSL_NO_ERR
 # ifndef FIPS_MODULE
         case OSSL_FUNC_PROVIDER_GET_REASON_STRINGS:
@@ -1585,6 +1590,14 @@ const OSSL_ALGORITHM *ossl_provider_query_operation(const OSSL_PROVIDER *prov,
         *no_cache = 1;
 #endif
     return res;
+}
+
+const OSSL_RH_FIPSINDICATOR_ALGORITHM *ossl_provider_query_fipsindicator(
+        const OSSL_PROVIDER *prov, int operation_id)
+{
+    if (prov->query_fipsindicator == NULL)
+        return NULL;
+    return prov->query_fipsindicator(prov->provctx, operation_id);
 }
 
 void ossl_provider_unquery_operation(const OSSL_PROVIDER *prov,

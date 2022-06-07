@@ -36,8 +36,9 @@ typedef struct ossl_method_construct_method_st {
     int (*put)(void *store, void *method, const OSSL_PROVIDER *prov,
                const char *name, const char *propdef, void *data);
     /* Construct a new method */
-    void *(*construct)(const OSSL_ALGORITHM *algodef, OSSL_PROVIDER *prov,
-                       void *data);
+    void *(*construct)(const OSSL_ALGORITHM *algodef,
+                       const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
+                       OSSL_PROVIDER *prov, void *data);
     /* Destruct a method */
     void (*destruct)(void *method, void *data);
 } OSSL_METHOD_CONSTRUCT_METHOD;
@@ -52,6 +53,7 @@ void ossl_algorithm_do_all(OSSL_LIB_CTX *libctx, int operation_id,
                                       int no_store, void *data, int *result),
                            void (*fn)(OSSL_PROVIDER *provider,
                                       const OSSL_ALGORITHM *algo,
+                                      const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
                                       int no_store, void *data),
                            int (*post)(OSSL_PROVIDER *, int operation_id,
                                        int no_store, void *data, int *result),

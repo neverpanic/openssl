@@ -24,6 +24,7 @@ OSSL_DECODER *ossl_decoder_fetch_by_number(OSSL_LIB_CTX *libctx,
  * (provider-object(7)).
  */
 void *ossl_decoder_from_algorithm(int id, const OSSL_ALGORITHM *algodef,
+                                  const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
                                   OSSL_PROVIDER *prov);
 
 OSSL_DECODER_INSTANCE *

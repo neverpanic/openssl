@@ -156,6 +156,35 @@ struct ossl_param_st {
  */
 # define OSSL_PARAM_OCTET_PTR            7
 
+
+# define OSSL_RH_FIPSINDICATOR_UNAPPROVED (0)
+# define OSSL_RH_FIPSINDICATOR_APPROVED (1)
+
+/*
+ * FIPS indicator dispatch table element.  function_id numbers and the
+ * functions are defined in core_dispatch.h, see macros with
+ * 'OSSL_CORE_MAKE_FUNC' in their names.
+ *
+ * An array of these is always terminated by function_id == 0
+ */
+struct ossl_rh_fipsindicator_dispatch_st {
+    int function_id;
+    int approved;
+};
+
+/*
+ * Type to tie together algorithm names, property definition string and the
+ * algorithm implementation's FIPS indicator status in the form of a FIPS
+ * indicator dispatch table.
+ *
+ * An array of these is always terminated by algorithm_names == NULL
+ */
+struct ossl_rh_fipsindicator_algorithm_st {
+    const char *algorithm_names;     /* key */
+    const char *property_definition; /* key */
+    const OSSL_RH_FIPSINDICATOR_DISPATCH *indicators;
+};
+
 /*
  * Typedef for the thread stop handling callback. Used both internally and by
  * providers.

@@ -238,18 +238,48 @@ const OSSL_DISPATCH ossl_##name##_functions[] = {                              \
     { OSSL_FUNC_DIGEST_DUPCTX, (void (*)(void))keccak_dupctx },                \
     PROV_DISPATCH_FUNC_DIGEST_GET_PARAMS(name)
 
-#define PROV_FUNC_SHA3_DIGEST(name, bitlen, blksize, dgstsize, flags)          \
+#define PROV_FUNC_SHA3_DIGEST_INDICATOR(name, approved)                        \
+const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_##name##_indicators[] = {            \
+    { OSSL_FUNC_DIGEST_INIT, approved },                                       \
+    { OSSL_FUNC_DIGEST_NEWCTX, approved },                                     \
+    { OSSL_FUNC_DIGEST_UPDATE, approved },                                     \
+    { OSSL_FUNC_DIGEST_FINAL, approved },                                      \
+    { OSSL_FUNC_DIGEST_FREECTX, approved },                                    \
+    { OSSL_FUNC_DIGEST_DUPCTX, approved },                                     \
+    { OSSL_FUNC_DIGEST_GET_PARAMS, approved },                                 \
+    { OSSL_FUNC_DIGEST_GETTABLE_PARAMS, approved },                            \
+    { 0, OSSL_RH_FIPSINDICATOR_UNAPPROVED }                                    \
+};
+
+#define PROV_FUNC_SHA3_DIGEST(name, bitlen, blksize, dgstsize, flags, approved) \
     PROV_FUNC_SHA3_DIGEST_COMMON(name, bitlen, blksize, dgstsize, flags),      \
     { OSSL_FUNC_DIGEST_INIT, (void (*)(void))keccak_init },                    \
-    PROV_DISPATCH_FUNC_DIGEST_CONSTRUCT_END
+    PROV_DISPATCH_FUNC_DIGEST_CONSTRUCT_END                                    \
+    PROV_FUNC_SHA3_DIGEST_INDICATOR(name, approved)
 
-#define PROV_FUNC_SHAKE_DIGEST(name, bitlen, blksize, dgstsize, flags)         \
+#define PROV_FUNC_SHAKE_DIGEST_INDICATOR(name, approved)                        \
+const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_##name##_indicators[] = {            \
+    { OSSL_FUNC_DIGEST_INIT, approved },                                       \
+    { OSSL_FUNC_DIGEST_SET_CTX_PARAMS, approved },                             \
+    { OSSL_FUNC_DIGEST_SETTABLE_CTX_PARAMS, approved },                        \
+    { OSSL_FUNC_DIGEST_NEWCTX, approved },                                     \
+    { OSSL_FUNC_DIGEST_UPDATE, approved },                                     \
+    { OSSL_FUNC_DIGEST_FINAL, approved },                                      \
+    { OSSL_FUNC_DIGEST_FREECTX, approved },                                    \
+    { OSSL_FUNC_DIGEST_DUPCTX, approved },                                     \
+    { OSSL_FUNC_DIGEST_GET_PARAMS, approved },                                 \
+    { OSSL_FUNC_DIGEST_GETTABLE_PARAMS, approved },                            \
+    { 0, OSSL_RH_FIPSINDICATOR_UNAPPROVED }                                    \
+};
+
+#define PROV_FUNC_SHAKE_DIGEST(name, bitlen, blksize, dgstsize, flags, approved) \
     PROV_FUNC_SHA3_DIGEST_COMMON(name, bitlen, blksize, dgstsize, flags),      \
     { OSSL_FUNC_DIGEST_INIT, (void (*)(void))keccak_init_params },             \
     { OSSL_FUNC_DIGEST_SET_CTX_PARAMS, (void (*)(void))shake_set_ctx_params }, \
     { OSSL_FUNC_DIGEST_SETTABLE_CTX_PARAMS,                                    \
      (void (*)(void))shake_settable_ctx_params },                              \
-    PROV_DISPATCH_FUNC_DIGEST_CONSTRUCT_END
+    PROV_DISPATCH_FUNC_DIGEST_CONSTRUCT_END                                    \
+    PROV_FUNC_SHAKE_DIGEST_INDICATOR(name, approved)
 
 static void keccak_freectx(void *vctx)
 {
@@ -297,36 +327,36 @@ static int shake_set_ctx_params(void *vctx, const OSSL_PARAM params[])
     return 1;
 }
 
-#define IMPLEMENT_SHA3_functions(bitlen)                                       \
+#define IMPLEMENT_SHA3_functions(bitlen, approved)                             \
     SHA3_newctx(sha3, SHA3_##bitlen, sha3_##bitlen, bitlen, '\x06')            \
     PROV_FUNC_SHA3_DIGEST(sha3_##bitlen, bitlen,                               \
                           SHA3_BLOCKSIZE(bitlen), SHA3_MDSIZE(bitlen),         \
-                          SHA3_FLAGS)
+                          SHA3_FLAGS, approved)
 
-#define IMPLEMENT_SHAKE_functions(bitlen)                                      \
+#define IMPLEMENT_SHAKE_functions(bitlen, approved)                            \
     SHA3_newctx(shake, SHAKE_##bitlen, shake_##bitlen, bitlen, '\x1f')         \
     PROV_FUNC_SHAKE_DIGEST(shake_##bitlen, bitlen,                             \
                           SHA3_BLOCKSIZE(bitlen), SHA3_MDSIZE(bitlen),         \
-                          SHAKE_FLAGS)
-#define IMPLEMENT_KMAC_functions(bitlen)                                       \
+                          SHAKE_FLAGS, approved)
+#define IMPLEMENT_KMAC_functions(bitlen, approved)                             \
     KMAC_newctx(keccak_kmac_##bitlen, bitlen, '\x04')                          \
     PROV_FUNC_SHAKE_DIGEST(keccak_kmac_##bitlen, bitlen,                       \
                            SHA3_BLOCKSIZE(bitlen), KMAC_MDSIZE(bitlen),        \
-                           KMAC_FLAGS)
+                           KMAC_FLAGS, approved)
 
 /* ossl_sha3_224_functions */
-IMPLEMENT_SHA3_functions(224)
+IMPLEMENT_SHA3_functions(224, OSSL_RH_FIPSINDICATOR_APPROVED)
 /* ossl_sha3_256_functions */
-IMPLEMENT_SHA3_functions(256)
+IMPLEMENT_SHA3_functions(256, OSSL_RH_FIPSINDICATOR_APPROVED)
 /* ossl_sha3_384_functions */
-IMPLEMENT_SHA3_functions(384)
+IMPLEMENT_SHA3_functions(384, OSSL_RH_FIPSINDICATOR_APPROVED)
 /* ossl_sha3_512_functions */
-IMPLEMENT_SHA3_functions(512)
+IMPLEMENT_SHA3_functions(512, OSSL_RH_FIPSINDICATOR_APPROVED)
 /* ossl_shake_128_functions */
-IMPLEMENT_SHAKE_functions(128)
+IMPLEMENT_SHAKE_functions(128, OSSL_RH_FIPSINDICATOR_APPROVED)
 /* ossl_shake_256_functions */
-IMPLEMENT_SHAKE_functions(256)
+IMPLEMENT_SHAKE_functions(256, OSSL_RH_FIPSINDICATOR_APPROVED)
 /* ossl_keccak_kmac_128_functions */
-IMPLEMENT_KMAC_functions(128)
+IMPLEMENT_KMAC_functions(128, OSSL_RH_FIPSINDICATOR_APPROVED)
 /* ossl_keccak_kmac_256_functions */
-IMPLEMENT_KMAC_functions(256)
+IMPLEMENT_KMAC_functions(256, OSSL_RH_FIPSINDICATOR_APPROVED)

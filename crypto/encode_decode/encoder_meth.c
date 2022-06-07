@@ -196,6 +196,7 @@ static int put_encoder_in_store(void *store, void *method,
 
 /* Create and populate a encoder method */
 static void *encoder_from_algorithm(int id, const OSSL_ALGORITHM *algodef,
+                                    const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
                                     OSSL_PROVIDER *prov)
 {
     OSSL_ENCODER *encoder = NULL;
@@ -297,6 +298,7 @@ static void *encoder_from_algorithm(int id, const OSSL_ALGORITHM *algodef,
  * then call encoder_from_algorithm() with that identity number.
  */
 static void *construct_encoder(const OSSL_ALGORITHM *algodef,
+                               const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
                                OSSL_PROVIDER *prov, void *data)
 {
     /*
@@ -313,7 +315,7 @@ static void *construct_encoder(const OSSL_ALGORITHM *algodef,
     void *method = NULL;
 
     if (id != 0)
-        method = encoder_from_algorithm(id, algodef, prov);
+        method = encoder_from_algorithm(id, algodef, fipsindicator, prov);
 
     /*
      * Flag to indicate that there was actual construction errors.  This

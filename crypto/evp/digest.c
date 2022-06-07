@@ -929,9 +929,11 @@ static int evp_md_cache_constants(EVP_MD *md)
     return ok;
 }
 
-static void *evp_md_from_algorithm(int name_id,
-                                   const OSSL_ALGORITHM *algodef,
-                                   OSSL_PROVIDER *prov)
+static void *evp_md_from_algorithm(
+        int name_id,
+        const OSSL_ALGORITHM *algodef,
+        const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
+        OSSL_PROVIDER *prov)
 {
     const OSSL_DISPATCH *fns = algodef->implementation;
     EVP_MD *md = NULL;
@@ -959,6 +961,7 @@ static void *evp_md_from_algorithm(int name_id,
         return NULL;
     }
     md->description = algodef->algorithm_description;
+    md->fipsindicators = fipsindicator != NULL ? fipsindicator->indicators : NULL;
 
     for (; fns->function_id != 0; fns++) {
         switch (fns->function_id) {
@@ -1103,4 +1106,17 @@ void EVP_MD_do_all_provided(OSSL_LIB_CTX *libctx,
     evp_generic_do_all(libctx, OSSL_OP_DIGEST,
                        (void (*)(void *, void *))fn, arg,
                        evp_md_from_algorithm, evp_md_up_ref, evp_md_free);
+}
+
+int EVP_MD_fips_indicator(EVP_MD *md, int function_id)
+{
+    if (md == NULL || md->fipsindicators == NULL)
+        return OSSL_RH_FIPSINDICATOR_UNAPPROVED;
+
+    const OSSL_RH_FIPSINDICATOR_DISPATCH *thisindicator;
+    for (thisindicator = md->fipsindicators; thisindicator->function_id != 0; thisindicator++)
+        if (thisindicator->function_id == function_id)
+            return thisindicator->approved;
+
+    return OSSL_RH_FIPSINDICATOR_UNAPPROVED;
 }

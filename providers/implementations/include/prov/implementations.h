@@ -38,6 +38,24 @@ extern const OSSL_DISPATCH ossl_wp_functions[];
 extern const OSSL_DISPATCH ossl_ripemd160_functions[];
 extern const OSSL_DISPATCH ossl_nullmd_functions[];
 
+#ifdef FIPS_MODULE
+extern const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_sha1_indicators[];
+extern const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_sha224_indicators[];
+extern const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_sha256_indicators[];
+extern const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_sha384_indicators[];
+extern const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_sha512_indicators[];
+extern const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_sha512_224_indicators[];
+extern const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_sha512_256_indicators[];
+extern const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_sha3_224_indicators[];
+extern const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_sha3_256_indicators[];
+extern const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_sha3_384_indicators[];
+extern const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_sha3_512_indicators[];
+extern const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_keccak_kmac_128_indicators[];
+extern const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_keccak_kmac_256_indicators[];
+extern const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_shake_128_indicators[];
+extern const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_shake_256_indicators[];
+#endif /* defined(FIPS_MODULE) */
+
 /* Ciphers */
 extern const OSSL_DISPATCH ossl_null_functions[];
 extern const OSSL_DISPATCH ossl_aes256ecb_functions[];

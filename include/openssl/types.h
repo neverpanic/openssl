@@ -219,6 +219,8 @@ typedef struct ossl_item_st OSSL_ITEM;
 typedef struct ossl_algorithm_st OSSL_ALGORITHM;
 typedef struct ossl_param_st OSSL_PARAM;
 typedef struct ossl_param_bld_st OSSL_PARAM_BLD;
+typedef struct ossl_rh_fipsindicator_dispatch_st OSSL_RH_FIPSINDICATOR_DISPATCH;
+typedef struct ossl_rh_fipsindicator_algorithm_st OSSL_RH_FIPSINDICATOR_ALGORITHM;
 
 typedef int pem_password_cb (char *buf, int size, int rwflag, void *userdata);
 

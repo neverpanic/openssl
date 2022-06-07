@@ -321,9 +321,11 @@ static EVP_ASYM_CIPHER *evp_asym_cipher_new(OSSL_PROVIDER *prov)
     return cipher;
 }
 
-static void *evp_asym_cipher_from_algorithm(int name_id,
-                                            const OSSL_ALGORITHM *algodef,
-                                            OSSL_PROVIDER *prov)
+static void *evp_asym_cipher_from_algorithm(
+        int name_id,
+        const OSSL_ALGORITHM *algodef,
+        const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
+        OSSL_PROVIDER *prov)
 {
     const OSSL_DISPATCH *fns = algodef->implementation;
     EVP_ASYM_CIPHER *cipher = NULL;

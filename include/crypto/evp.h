@@ -284,6 +284,7 @@ struct evp_md_st {
     OSSL_FUNC_digest_gettable_params_fn *gettable_params;
     OSSL_FUNC_digest_settable_ctx_params_fn *settable_ctx_params;
     OSSL_FUNC_digest_gettable_ctx_params_fn *gettable_ctx_params;
+    const OSSL_RH_FIPSINDICATOR_DISPATCH *fipsindicators;
 
 } /* EVP_MD */ ;
 

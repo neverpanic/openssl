@@ -97,6 +97,19 @@ PROV_DISPATCH_FUNC_DIGEST_CONSTRUCT_START(name, CTX, blksize, dgstsize, flags, \
     { OSSL_FUNC_DIGEST_INIT, (void (*)(void))name##_internal_init },           \
 PROV_DISPATCH_FUNC_DIGEST_CONSTRUCT_END
 
+# define INDICATORS_digest_functions(name, approved)                           \
+const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_##name##_indicators[] = {            \
+    { OSSL_FUNC_DIGEST_INIT, approved },                                       \
+    { OSSL_FUNC_DIGEST_NEWCTX, approved },                                     \
+    { OSSL_FUNC_DIGEST_UPDATE, approved },                                     \
+    { OSSL_FUNC_DIGEST_FINAL, approved },                                      \
+    { OSSL_FUNC_DIGEST_FREECTX, approved },                                    \
+    { OSSL_FUNC_DIGEST_DUPCTX, approved },                                     \
+    { OSSL_FUNC_DIGEST_GET_PARAMS, approved },                                 \
+    { OSSL_FUNC_DIGEST_GETTABLE_PARAMS, approved },                            \
+    { 0, OSSL_RH_FIPSINDICATOR_UNAPPROVED }                                    \
+};
+
 # define IMPLEMENT_digest_functions_with_settable_ctx(                         \
     name, CTX, blksize, dgstsize, flags, init, upd, fin,                       \
     settable_ctx_params, set_ctx_params)                                       \
@@ -113,6 +126,21 @@ PROV_DISPATCH_FUNC_DIGEST_CONSTRUCT_START(name, CTX, blksize, dgstsize, flags, \
     { OSSL_FUNC_DIGEST_SETTABLE_CTX_PARAMS, (void (*)(void))settable_ctx_params }, \
     { OSSL_FUNC_DIGEST_SET_CTX_PARAMS, (void (*)(void))set_ctx_params },       \
 PROV_DISPATCH_FUNC_DIGEST_CONSTRUCT_END
+
+# define INDICATORS_digest_functions_with_settable_ctx(name, approved)         \
+const OSSL_RH_FIPSINDICATOR_DISPATCH ossl_##name##_indicators[] = {            \
+    { OSSL_FUNC_DIGEST_INIT, approved },                                       \
+    { OSSL_FUNC_DIGEST_SETTABLE_CTX_PARAMS, approved },                        \
+    { OSSL_FUNC_DIGEST_SET_CTX_PARAMS, approved },                             \
+    { OSSL_FUNC_DIGEST_NEWCTX, approved },                                     \
+    { OSSL_FUNC_DIGEST_UPDATE, approved },                                     \
+    { OSSL_FUNC_DIGEST_FINAL, approved },                                      \
+    { OSSL_FUNC_DIGEST_FREECTX, approved },                                    \
+    { OSSL_FUNC_DIGEST_DUPCTX, approved },                                     \
+    { OSSL_FUNC_DIGEST_GET_PARAMS, approved },                                 \
+    { OSSL_FUNC_DIGEST_GETTABLE_PARAMS, approved },                            \
+    { 0, OSSL_RH_FIPSINDICATOR_UNAPPROVED }                                    \
+};
 
 
 const OSSL_PARAM *ossl_digest_default_gettable_params(void *provctx);

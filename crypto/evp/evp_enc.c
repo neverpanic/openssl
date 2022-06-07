@@ -1464,9 +1464,11 @@ static void set_legacy_nid(const char *name, void *vlegacy_nid)
 }
 #endif
 
-static void *evp_cipher_from_algorithm(const int name_id,
-                                       const OSSL_ALGORITHM *algodef,
-                                       OSSL_PROVIDER *prov)
+static void *evp_cipher_from_algorithm(
+        const int name_id,
+        const OSSL_ALGORITHM *algodef,
+        const OSSL_RH_FIPSINDICATOR_ALGORITHM *fipsindicator,
+        OSSL_PROVIDER *prov)
 {
     const OSSL_DISPATCH *fns = algodef->implementation;
     EVP_CIPHER *cipher = NULL;
