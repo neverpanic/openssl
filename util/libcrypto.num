@@ -5530,3 +5530,7 @@ OSSL_ERR_STATE_restore                  ?	3_2_0	EXIST::FUNCTION:
 OSSL_ERR_STATE_free                     ?	3_2_0	EXIST::FUNCTION:
 ERR_count_to_mark                       ?	3_2_0	EXIST::FUNCTION:
 OSSL_ERR_STATE_save_to_mark             ?	3_2_0	EXIST::FUNCTION:
+EVP_signature_md_algorithms_set         ?	3_2_0	EXIST::FUNCTION:
+EVP_signature_md_algorithms_get         ?	3_2_0	EXIST::FUNCTION:
+EVP_signature_md_algorithm_allowed      ?	3_2_0	EXIST::FUNCTION:
+EVP_signature_md_algorithm_set          ?	3_2_0	EXIST::FUNCTION:
