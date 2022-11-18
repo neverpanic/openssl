@@ -548,6 +548,31 @@ my @smime_cms_param_tests = (
       \&final_compare
     ],
 
+    [ "signed content test streaming PEM format, RSA keys, PSS signature, saltlen=auto-digestmax, digestsize < maximum salt length",
+      [ "{cmd1}", @defaultprov, "-sign", "-in", $smcont, "-outform", "PEM", "-nodetach",
+        "-signer", $smrsa1024, "-md", "sha256",
+        "-keyopt", "rsa_padding_mode:pss", "-keyopt", "rsa_pss_saltlen:auto-digestmax",
+        "-out", "{output}.cms" ],
+      # digest is SHA-256, which produces 32, bytes of output
+      sub { my %opts = @_; rsapssSaltlen("$opts{output}.cms") == 32; },
+      [ "{cmd2}", @defaultprov, "-verify", "-in", "{output}.cms", "-inform", "PEM",
+        "-CAfile", $smroot, "-out", "{output}.txt" ],
+      \&final_compare
+    ],
+
+    [ "signed content test streaming PEM format, RSA keys, PSS signature, saltlen=auto-digestmax, digestsize > maximum salt length",
+      [ "{cmd1}", @defaultprov, "-sign", "-in", $smcont, "-outform", "PEM", "-nodetach",
+        "-signer", $smrsa1024, "-md", "sha512",
+        "-keyopt", "rsa_padding_mode:pss", "-keyopt", "rsa_pss_saltlen:auto-digestmax",
+        "-out", "{output}.cms" ],
+      # digest is SHA-512, which produces 64, bytes of output, but an RSA-PSS
+      # signature with a 1024 bit RSA key can only accomodate 62
+      sub { my %opts = @_; rsapssSaltlen("$opts{output}.cms") == 62; },
+      [ "{cmd2}", @defaultprov, "-verify", "-in", "{output}.cms", "-inform", "PEM",
+        "-CAfile", $smroot, "-out", "{output}.txt" ],
+      \&final_compare
+    ],
+
     [ "enveloped content test streaming S/MIME format, DES, OAEP default parameters",
       [ "{cmd1}", @defaultprov, "-encrypt", "-in", $smcont,
         "-stream", "-out", "{output}.cms",
