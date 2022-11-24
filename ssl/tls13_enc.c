@@ -12,6 +12,7 @@
 #include "internal/ktls.h"
 #include "record/record_local.h"
 #include "internal/cryptlib.h"
+#include "internal/audit.h"
 #include <openssl/evp.h>
 #include <openssl/kdf.h>
 #include <openssl/core_names.h>
@@ -325,6 +326,11 @@ int tls13_setup_key_block(SSL_CONNECTION *s)
         SSLfatal_alert(s, SSL_AD_INTERNAL_ERROR);
         return 0;
     }
+
+    /* Log the TLS version and cipher suite identifier into BPF */
+    AUDIT_WORD_DATA(&s->session, "tls::protocol_version", s->version);
+    AUDIT_WORD_DATA(&s->session, "tls::ciphersuite",
+                    SSL_CIPHER_get_protocol_id(s->session->cipher));
 
     ssl_evp_cipher_free(s->s3.tmp.new_sym_enc);
     s->s3.tmp.new_sym_enc = c;
